@@ -1,0 +1,11 @@
+import { writeFile } from 'node:fs/promises'
+const [url='http://127.0.0.1:4173/',output='.qa-capture.png',widthArg='1440',heightArg='1000'] = process.argv.slice(2)
+const width=Number(widthArg),height=Number(heightArg)
+const targets=await fetch('http://127.0.0.1:9222/json/list').then(r=>r.json())
+const target=targets.find(item=>item.type==='page'&&item.url.includes('127.0.0.1:4173'))
+if(!target)throw new Error('No se encontró la app en Edge')
+const socket=new WebSocket(target.webSocketDebuggerUrl);let seq=0;const pending=new Map()
+const send=(method,params={})=>new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});socket.send(JSON.stringify({id,method,params}))})
+socket.addEventListener('message',event=>{const m=JSON.parse(event.data);if(m.id&&pending.has(m.id)){const p=pending.get(m.id);pending.delete(m.id);m.error?p.reject(new Error(m.error.message)):p.resolve(m.result)}})
+await new Promise((resolve,reject)=>{socket.addEventListener('open',resolve,{once:true});socket.addEventListener('error',reject,{once:true})})
+await send('Page.enable');await send('Page.bringToFront');await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<600});await send('Page.navigate',{url});await new Promise(r=>setTimeout(r,1800));await send('Page.bringToFront');const result=await send('Page.captureScreenshot',{format:'png',fromSurface:true,captureBeyondViewport:true});await writeFile(output,Buffer.from(result.data,'base64'));socket.close();console.log(`Captura: ${output}`)

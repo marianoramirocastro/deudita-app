@@ -1,0 +1,4 @@
+import type { ProgressCharacter } from '../types/models'
+import { characterLabels } from '../types/labels'
+import { formatARS } from '../utils/format'
+export function ProgressTrack({percent,character,paid,remaining}:{percent:number;character:ProgressCharacter;paid:number;remaining:number}){const safe=Math.min(100,Math.max(0,percent));return <div className="progress-card"><div className="progress-labels"><strong>{Math.round(safe)}% del camino</strong><span>{formatARS(remaining)} restantes</span></div><div className="progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(safe)}><div className="progress-fill" style={{width:`${safe}%`}}/><span className="progress-character" style={{left:`clamp(12px, ${safe}%, calc(100% - 12px))`}} aria-hidden>{characterLabels[character].icon}</span></div><small>Ya pagaste {formatARS(paid)}</small></div>}

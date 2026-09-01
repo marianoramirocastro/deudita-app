@@ -1,0 +1,4 @@
+import { describe, expect, it } from 'vitest'
+import { parseBackup } from './backup'
+const valid={schemaVersion:1,exportedAt:'2026-09-01T12:00:00.000Z',incomes:[{id:'i',label:'Sueldo',amount:100,kind:'salary'}],expenses:[],debts:[],payments:[],snapshots:[],savingsGoals:[],settings:{strategy:'snowball',progressCharacter:'car',hideEncouragement:false,reduceMotion:false,comfortable:true,onboardingComplete:true}}
+describe('backups',()=>{it('acepta un backup versionado válido',()=>expect(parseBackup(JSON.stringify(valid)).schemaVersion).toBe(1));it('rechaza montos negativos sin tocar la base',()=>expect(()=>parseBackup(JSON.stringify({...valid,incomes:[{...valid.incomes[0],amount:-1}]}))).toThrow());it('rechaza versiones desconocidas',()=>expect(()=>parseBackup(JSON.stringify({...valid,schemaVersion:99}))).toThrow())})

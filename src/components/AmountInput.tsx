@@ -1,0 +1,2 @@
+interface Props { value:number|string; onChange:(amount:number)=>void; id?:string; required?:boolean; placeholder?:string; ariaLabel?:string }
+export function AmountInput({value,onChange,id,required,placeholder='0',ariaLabel}:Props){return <div className="money-input"><span>$</span><input id={id} aria-label={ariaLabel} inputMode="numeric" type="number" min="0" step="1" value={value} required={required} placeholder={placeholder} onChange={e=>onChange(Math.max(0,Number(e.target.value)||0))}/></div>}
