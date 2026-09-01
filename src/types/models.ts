@@ -20,8 +20,8 @@ export interface Debt {
 export interface DebtPayment { id: ID; debtId: ID; amount: number; date: string; note?: string; currency: Currency; conversionRate?: number; amountARS?: number }
 export interface MonthlySnapshot { id: ID; date: string; incomeTotal: number; essentialTotal: number; adjustableTotal: number; debtTotal: number }
 export interface SavingsGoal { id: ID; expenseLabel: string; currentAmount: number; targetAmount: number; createdAt: string }
-export type ProgressCharacter = 'runner' | 'woman' | 'walker' | 'car' | 'bike' | 'rocket' | 'capybara' | 'mate' | 'dot'
-export interface BubblePosition { x: number; y: number }
+export type ProgressCharacter = 'runner' | 'woman' | 'walker' | 'car' | 'bike' | 'rocket' | 'mate' | 'dot'
+export interface BubblePosition { xRatio: number; yRatio: number }
 export interface Settings { strategy: StrategyKind; progressCharacter: ProgressCharacter; hideEncouragement: boolean; reduceMotion: boolean; comfortable: boolean; onboardingComplete: boolean; lastMonthlyReview?: string; experienceMode?: ExperienceMode; showQuickHelp: boolean; quickHelpMinimized: boolean; bubblePosition?: BubblePosition; showReflections: boolean; lastQuoteDate?: string; preferredConversion: ConversionPreference; manualExchangeRate?: number; manualExchangeReason?: string }
 export interface AppMeta { id: 'main'; schemaVersion: number; createdAt: string; updatedAt: string }
 export interface ExchangeRate { type: ExchangeRateType; buy: number; sell: number; updatedAt: string; fetchedAt: string; provider: 'DolarAPI'; source: 'DolarHoy' | 'Ámbito Financiero' }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateBudget, calculateProgress, formatProgressPercent, mandatoryPayment, orderDebts, projectDebts, reductionImpact } from '.'
+import { calculateBudget, calculatePortfolioProgress, formatProgressPercent, mandatoryPayment, orderDebts, projectDebts, reductionImpact } from '.'
 import type { Debt } from '../types/models'
 
 const debt=(overrides:Partial<Debt>={}):Debt=>({id:'a',name:'Visa',type:'credit_card',balance:100000,initialBalance:100000,minimumPayment:10000,personalUrgency:3,priorityReasons:[],manualOrder:0,createdAt:'2026-01-01',currency:'ARS',status:'active',...overrides})
@@ -11,11 +11,11 @@ describe('financial engine',()=>{
   it('proyecta interés cero y deuda ya pagada',()=>{expect(projectDebts([debt({balance:100,initialBalance:100,minimumPayment:0,annualRate:0})],100,'snowball').months).toBe(1);expect(projectDebts([debt({balance:0})],100,'snowball').months).toBe(0)})
   it('marca como aproximado si falta tasa y no inventa intereses',()=>{const result=projectDebts([debt()],10000,'snowball');expect(result.approximate).toBe(true);expect(result.estimatedInterest).toBeNull()})
   it('no produce NaN con números grandes',()=>{const result=projectDebts([debt({balance:1e12,initialBalance:1e12,minimumPayment:1e11,annualRate:20})],1e11,'avalanche');expect(Number.isFinite(result.totalPaid)).toBe(true)})
-  it('calcula progreso y evita negativos',()=>{expect(calculateProgress([debt({initialBalance:100,balance:60})])).toMatchObject({initial:100,remaining:60,paid:40,percent:40,method:'native'})})
-  it.each([[100,100,0],[100,99.5,.5],[100,99,1],[100,62,38],[100,1,99],[100,0,100]])('muestra progreso exacto de %s a %s', (initial,balance,percent)=>expect(calculateProgress([debt({initialBalance:initial,balance,status:balance===0?'paid':'active'})]).percent).toBe(percent))
-  it('una deuda nueva actualiza honestamente el denominador',()=>expect(calculateProgress([debt({id:'a',initialBalance:100,balance:50}),debt({id:'b',initialBalance:100,balance:100})]).percent).toBe(25))
-  it('progreso USD depende del saldo USD y no de la cotización',()=>{const before=calculateProgress([debt({currency:'USD',initialBalance:50,balance:30,conversionRate:1900})]),after=calculateProgress([debt({currency:'USD',initialBalance:50,balance:30,conversionRate:2200})]);expect(before.percent).toBe(40);expect(after.percent).toBe(40)})
-  it('cartera mixta usa referencias iniciales bloqueadas',()=>{const result=calculateProgress([debt({currency:'ARS',initialBalance:100000,balance:50000}),debt({id:'u',currency:'USD',initialBalance:100,balance:50,initialConvertedBalanceARS:200000})]);expect(result).toMatchObject({percent:50,method:'locked_ars'})})
+  it('calcula progreso y evita negativos',()=>{expect(calculatePortfolioProgress([debt({initialBalance:100,balance:60})])).toMatchObject({initialTotal:100,currentOutstanding:60,totalPaidPrincipal:40,progressPercent:40,method:'native'})})
+  it.each([[100,100,0],[100,99.5,.5],[100,99,1],[100,62,38],[100,1,99],[100,0,100]])('muestra progreso exacto de %s a %s', (initial,balance,percent)=>expect(calculatePortfolioProgress([debt({initialBalance:initial,balance,status:balance===0?'paid':'active'})]).progressPercent).toBe(percent))
+  it('una deuda nueva actualiza honestamente el denominador',()=>expect(calculatePortfolioProgress([debt({id:'a',initialBalance:100,balance:50}),debt({id:'b',initialBalance:100,balance:100})]).progressPercent).toBe(25))
+  it('progreso USD depende del saldo USD y no de la cotización',()=>{const before=calculatePortfolioProgress([debt({currency:'USD',initialBalance:50,balance:30,conversionRate:1900})]),after=calculatePortfolioProgress([debt({currency:'USD',initialBalance:50,balance:30,conversionRate:2200})]);expect(before.progressPercent).toBe(40);expect(after.progressPercent).toBe(40)})
+  it('cartera mixta usa referencias iniciales bloqueadas',()=>{const result=calculatePortfolioProgress([debt({currency:'ARS',initialBalance:100000,balance:50000}),debt({id:'u',currency:'USD',initialBalance:100,balance:50,initialConvertedBalanceARS:200000})]);expect(result).toMatchObject({progressPercent:50,method:'locked_ars'})})
   it('formatea microprogreso sin esconderlo',()=>{expect(formatProgressPercent(.5)).toBe('0,5%');expect(formatProgressPercent(1)).toBe('1%');expect(formatProgressPercent(38.4)).toBe('38,4%');expect(formatProgressPercent(100)).toBe('100%')})
   it('un recorte nunca alarga el plan',()=>{const result=reductionImpact(10000,[debt({annualRate:0})],10000,'snowball');expect(result.changed.months!).toBeLessThanOrEqual(result.base.months!)})
 })
