@@ -2,12 +2,13 @@ import Dexie, { type EntityTable } from 'dexie'
 import type { AppMeta, Debt, DebtPayment, ExchangeRate, Expense, Income, MonthlySnapshot, SavingsGoal, Settings } from '../types/models'
 
 export const defaultSettings: Settings = { strategy: 'snowball', progressCharacter: 'car', hideEncouragement: false, reduceMotion: false, comfortable: true, onboardingComplete: false, showQuickHelp:true, quickHelpMinimized:false, showReflections:true, preferredConversion:'card' }
+export const DB_NAME = 'proyecto-salida'
 
 class SalidaDB extends Dexie {
   incomes!: EntityTable<Income, 'id'>; expenses!: EntityTable<Expense, 'id'>; debts!: EntityTable<Debt, 'id'>; payments!: EntityTable<DebtPayment, 'id'>;
   snapshots!: EntityTable<MonthlySnapshot, 'id'>; savingsGoals!: EntityTable<SavingsGoal, 'id'>; settings!: EntityTable<Settings & { id: 'main' }, 'id'>; meta!: EntityTable<AppMeta, 'id'>; exchangeRates!: EntityTable<ExchangeRate, 'type'>
   constructor() {
-    super('proyecto-salida')
+    super(DB_NAME)
     this.version(1).stores({ incomes:'id,kind', expenses:'id,kind', debts:'id,type,dueDate,manualOrder', payments:'id,debtId,date', snapshots:'id,date', savingsGoals:'id', settings:'id', meta:'id' })
     this.version(2).stores({ incomes:'id,kind', expenses:'id,kind', debts:'id,type,dueDate,manualOrder,status,currency', payments:'id,debtId,date,currency', snapshots:'id,date', savingsGoals:'id', settings:'id', meta:'id', exchangeRates:'type,updatedAt,fetchedAt' }).upgrade(async tx=>{
       await tx.table('debts').toCollection().modify(debt=>{debt.currency=debt.currency??'ARS';debt.status=debt.balance>0?'active':'paid';if(debt.status==='paid'&&!debt.paidAt)debt.paidAt=new Date().toISOString()})

@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Shell } from './components/Shell'
 import { Article } from './pages/Article'
+import { AboutProject } from './pages/AboutProject'
 import { Dashboard } from './pages/Dashboard'
 import { Debts } from './pages/Debts'
 import { Demo } from './pages/Demo'
@@ -15,4 +16,4 @@ import { SimpleDashboard } from './pages/SimpleDashboard'
 import { SimpleStart } from './pages/SimpleStart'
 import { DebtGuide, HowItWorks, Privacy } from './pages/StaticPages'
 import { Tools } from './pages/Tools'
-export default function App(){return <BrowserRouter><Routes><Route path="/" element={<Home/>}/><Route path="/simple/empezar" element={<SimpleStart/>}/><Route path="/simple" element={<SimpleDashboard/>}/><Route path="/empezar" element={<Onboarding/>}/><Route path="/demo" element={<Demo/>}/><Route path="/privacidad" element={<Privacy/>}/><Route path="/como-funciona" element={<HowItWorks/>}/><Route path="/entender-deudas" element={<DebtGuide/>}/><Route path="/:slug" element={<Article/>}/><Route element={<Shell/>}><Route path="/plan" element={<Dashboard/>}/><Route path="/deudas" element={<Debts/>}/><Route path="/gastos" element={<Expenses/>}/><Route path="/simular" element={<Simulate/>}/><Route path="/progreso" element={<Progress/>}/><Route path="/entender" element={<Learn/>}/><Route path="/herramientas" element={<Tools/>}/><Route path="/mas" element={<More/>}/></Route><Route path="*" element={<Navigate to="/" replace/>}/></Routes></BrowserRouter>}
+export default function App(){return <BrowserRouter><Routes><Route path="/" element={<Home/>}/><Route path="/simple/empezar" element={<SimpleStart/>}/><Route path="/simple" element={<SimpleDashboard/>}/><Route path="/empezar" element={<Onboarding/>}/><Route path="/demo" element={<Demo/>}/><Route path="/privacidad" element={<Privacy/>}/><Route path="/como-funciona" element={<HowItWorks/>}/><Route path="/entender-deudas" element={<DebtGuide/>}/><Route path="/:slug" element={<Article/>}/><Route element={<Shell/>}><Route path="/plan" element={<Dashboard/>}/><Route path="/deudas" element={<Debts/>}/><Route path="/gastos" element={<Expenses/>}/><Route path="/simular" element={<Simulate/>}/><Route path="/progreso" element={<Progress/>}/><Route path="/entender" element={<Learn/>}/><Route path="/herramientas" element={<Tools/>}/><Route path="/mas" element={<More/>}/><Route path="/sobre-el-proyecto" element={<AboutProject/>}/></Route><Route path="*" element={<Navigate to="/" replace/>}/></Routes></BrowserRouter>}

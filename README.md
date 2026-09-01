@@ -1,6 +1,6 @@
-# Proyecto Salida
+# DeudARG
 
-MVP web/PWA argentino para ordenar deudas con claridad, privacidad local y acompañamiento sin juicio. No tiene backend, cuentas, conexión bancaria ni analytics.
+Aplicación web/PWA argentina, local-first, para organizar y seguir deudas con claridad, privacidad y acompañamiento sin juicio. Su lema es: **“Organizá tus deudas. Una cosa por vez.”** No tiene backend, cuentas, conexión bancaria ni analytics.
 
 Ofrece dos experiencias sobre la misma base local:
 
@@ -45,7 +45,11 @@ src/
 
 ## Datos y privacidad
 
-Ingresos, gastos, deudas, pagos, prioridades, snapshots, objetivos y preferencias viven en la base IndexedDB `proyecto-salida`, versión 1. No se envían desde la app. Un archivo de backup JSON sí contiene información sensible y actualmente no está cifrado; debe guardarse de forma segura. Borrar datos del navegador puede borrar el plan.
+Ingresos, gastos, deudas, pagos, prioridades, snapshots, objetivos y preferencias viven en la base IndexedDB `proyecto-salida`, versión 3. Ese identificador técnico se conserva por compatibilidad con las instalaciones existentes aunque la marca pública ahora sea DeudARG. Los datos no se envían desde la app. Un archivo de backup JSON sí contiene información sensible y actualmente no está cifrado; debe guardarse de forma segura. Borrar datos del navegador puede borrar el plan.
+
+## Sobre el proyecto
+
+DeudARG es una herramienta independiente hecha en Argentina. Gran parte de su desarrollo fue realizado con ayuda de Codex, pero los cálculos financieros principales usan funciones determinísticas cubiertas por pruebas automatizadas. No está afiliada al BCRA, bancos, entidades financieras, Veraz, DolarAPI ni proveedores de cotizaciones.
 
 Ver [PRIVACY.md](./PRIVACY.md) para el inventario detallado.
 
