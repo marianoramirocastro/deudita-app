@@ -1,6 +1,13 @@
 # Proyecto Salida
 
-MVP web/PWA argentino para ordenar deudas con claridad, privacidad local y acompañamiento sin juicio. No tiene backend, cuentas, conexión bancaria, analytics ni API paga.
+MVP web/PWA argentino para ordenar deudas con claridad, privacidad local y acompañamiento sin juicio. No tiene backend, cuentas, conexión bancaria ni analytics.
+
+Ofrece dos experiencias sobre la misma base local:
+
+- **Simple:** alta en menos de un minuto, saldo, progreso, pagos y conversor USD.
+- **Completa:** presupuesto, prioridades, estrategias, simulación y calendario.
+
+Cada deuda conserva su moneda (ARS o USD). Las referencias blue y tarjeta se obtienen de los endpoints públicos de DolarAPI, muestran fecha y fuente informada y se cachean localmente. Ningún saldo ni otro dato financiero se envía en esas consultas.
 
 ## Requisitos y comandos
 
@@ -28,6 +35,7 @@ src/
   config/              branding centralizado
   content/             artículos y fuentes actualizables
   financial-engine/    cálculos puros y tests
+  exchange-rate-service/ cotizaciones, validación y caché
   hooks/               consultas reactivas
   pages/               pantallas y contenidos públicos
   storage/             IndexedDB, schema y backups

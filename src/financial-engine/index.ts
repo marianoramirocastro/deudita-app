@@ -6,14 +6,15 @@ export interface Projection { strategy:StrategyKind; months:number|null; totalPa
 
 const finite = (n:number) => Number.isFinite(n) ? n : 0
 export const sumAmounts = (items: Array<{amount:number}>) => finite(items.reduce((sum,item) => sum + finite(Math.max(0,item.amount)), 0))
-export const mandatoryPayment = (debt:Debt) => Math.min(Math.max(0,debt.balance), Math.max(0,debt.minimumPayment,debt.agreedPayment ?? 0))
+export const mandatoryPayment = (debt:Debt) => debt.status==='paid'?0:Math.min(Math.max(0,debt.balance), Math.max(0,debt.minimumPayment,debt.agreedPayment ?? 0))
+const arsFactor=(debt:Debt)=>debt.currency==='USD'?(debt.conversionRate??0):1
 export function calculateBudget(incomes:Income[], expenses:Expense[], debts:Debt[]):BudgetSummary {
-  const income=sumAmounts(incomes), essential=sumAmounts(expenses.filter(e=>e.kind==='essential')), adjustable=sumAmounts(expenses.filter(e=>e.kind==='adjustable')), mandatoryDebt=debts.reduce((s,d)=>s+mandatoryPayment(d),0)
+  const income=sumAmounts(incomes), essential=sumAmounts(expenses.filter(e=>e.kind==='essential')), adjustable=sumAmounts(expenses.filter(e=>e.kind==='adjustable')), mandatoryDebt=debts.reduce((s,d)=>s+mandatoryPayment(d)*arsFactor(d),0)
   const afterEssentials=income-essential, remainder=afterEssentials-mandatoryDebt
   return { income,essential,adjustable,mandatoryDebt,afterEssentials,availableExtra:Math.max(0,remainder),deficit:Math.max(0,-remainder) }
 }
 export function orderDebts(debts:Debt[], strategy:StrategyKind):Debt[] {
-  const active=debts.filter(d=>d.balance>0)
+  const active=debts.filter(d=>d.status!=='paid'&&d.balance>0)
   return [...active].sort((a,b)=> {
     if(strategy==='avalanche') return (b.annualRate ?? -1)-(a.annualRate ?? -1) || a.balance-b.balance
     if(strategy==='snowball') return a.balance-b.balance
@@ -23,7 +24,7 @@ export function orderDebts(debts:Debt[], strategy:StrategyKind):Debt[] {
 }
 const addMonths=(start:Date,n:number)=>{const d=new Date(start);d.setUTCMonth(d.getUTCMonth()+n);return d.toISOString().slice(0,10)}
 export function projectDebts(debts:Debt[], monthlyExtra:number, strategy:StrategyKind, startDate=new Date(), maxMonths=600):Projection {
-  const active=debts.filter(d=>d.balance>0).map(d=>({...d}))
+  const active=debts.filter(d=>d.status!=='paid'&&d.balance>0&&(d.currency!=='USD'||arsFactor(d)>0)).map(d=>{const factor=arsFactor(d);return d.currency==='USD'?{...d,balance:d.balance*factor,initialBalance:d.initialBalance*factor,minimumPayment:d.minimumPayment*factor,agreedPayment:d.agreedPayment===undefined?undefined:d.agreedPayment*factor,currency:'ARS' as const}:{...d}})
   if(!active.length) return {strategy,months:0,totalPaid:0,estimatedInterest:0,completionDate:startDate.toISOString().slice(0,10),schedule:[],approximate:false,stalled:false}
   const unknownRates=active.some(d=>d.annualRate===undefined)
   const balances=new Map(active.map(d=>[d.id,d.balance])); let totalPaid=0,totalInterest=0,firstCompletedDebtId:string|undefined
@@ -41,6 +42,7 @@ export function projectDebts(debts:Debt[], monthlyExtra:number, strategy:Strateg
   }
   return {strategy,months:null,totalPaid,estimatedInterest:unknownRates?null:totalInterest,completionDate:null,firstCompletedDebtId,schedule,approximate:unknownRates,stalled:true}
 }
-export const calculateProgress=(debts:Debt[])=>{const initial=debts.reduce((s,d)=>s+Math.max(d.initialBalance,d.balance),0), remaining=debts.reduce((s,d)=>s+Math.max(0,d.balance),0), paid=Math.max(0,initial-remaining);return{initial,remaining,paid,percent:initial>0?Math.min(100,paid/initial*100):0}}
+export const calculateProgress=(debts:Debt[])=>{const valid=debts.filter(d=>d.initialBalance>0);if(!valid.length)return{initial:0,remaining:0,paid:0,percent:0,method:'native' as const};const currencies=new Set(valid.map(d=>d.currency));if(currencies.size===1){const initial=valid.reduce((s,d)=>s+Math.max(d.initialBalance,d.balance),0),remaining=valid.reduce((s,d)=>s+Math.max(0,d.balance),0),paid=Math.max(0,initial-remaining);return{initial,remaining,paid,percent:remaining===0?100:Math.min(99.999,paid/initial*100),method:'native' as const,currency:valid[0].currency}}const weights=valid.map(d=>d.currency==='ARS'?d.initialBalance:(d.initialConvertedBalanceARS??(d.conversionRate?d.initialBalance*d.conversionRate:0)));if(weights.every(w=>w>0)){const initial=weights.reduce((s,w)=>s+w,0),remaining=valid.reduce((s,d,i)=>s+weights[i]*(Math.max(0,d.balance)/d.initialBalance),0),paid=Math.max(0,initial-remaining);return{initial,remaining,paid,percent:remaining===0?100:Math.min(99.999,paid/initial*100),method:'locked_ars' as const,currency:'ARS' as const}}const remainingRatio=valid.reduce((s,d)=>s+Math.max(0,d.balance)/d.initialBalance,0),initial=valid.length,remaining=remainingRatio,paid=initial-remaining;return{initial,remaining,paid,percent:remaining===0?100:Math.min(99.999,paid/initial*100),method:'equal_debt_average' as const}}
+export const formatProgressPercent=(percent:number)=>{if(percent===100)return'100%';if(percent<=0)return'0%';const digits=percent<1?1:(Math.abs(percent-Math.round(percent))>=.05?1:0);return `${percent.toLocaleString('es-AR',{minimumFractionDigits:digits,maximumFractionDigits:1})}%`}
 export function impulseImpact(amount:number,debts:Debt[],extra:number,strategy:StrategyKind){const base=projectDebts(debts,extra,strategy), boosted=projectDebts(debts,extra+Math.max(0,amount),strategy);return{debtPercent:calculateProgress(debts).remaining>0?amount/calculateProgress(debts).remaining*100:0,daysAdvanced:base.months!==null&&boosted.months!==null?Math.max(0,(base.months-boosted.months)*30):null}}
 export function reductionImpact(monthlySaving:number,debts:Debt[],extra:number,strategy:StrategyKind){const base=projectDebts(debts,extra,strategy),changed=projectDebts(debts,extra+Math.max(0,monthlySaving),strategy);return{base,changed,daysAdvanced:base.months!==null&&changed.months!==null?Math.max(0,(base.months-changed.months)*30):null}}

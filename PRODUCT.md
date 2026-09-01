@@ -14,6 +14,8 @@ Transformar una situación difusa en un próximo paso visible: cuánto se debe, 
 6. Registro de pagos y progreso verificable.
 7. Crisis mensual sin recomendaciones peligrosas.
 8. Herramientas conductuales sin culpa.
+9. Entrada Simple o Completa sin bases de datos separadas.
+10. Deudas ARS/USD sin sumar monedas de forma implícita.
 
 ## Decisiones importantes
 
@@ -23,6 +25,8 @@ Transformar una situación difusa en un próximo paso visible: cuánto se debe, 
 - El modo demo es una vista aislada con datos ficticios y no escribe en IndexedDB.
 - Los snapshots son explícitos (“Cerrar este mes”) para no crear históricos sin que la persona entienda el momento medido.
 - La información regulatoria vive en una estructura de contenido con fuente externa, no dentro del motor.
+- En carteras mixtas, el progreso usa la referencia ARS fijada al alta; si no existe, promedia el avance relativo de cada deuda y lo explica. La cotización diaria nunca reescribe el avance histórico.
+- Las cotizaciones blue y tarjeta se usan como referencia explícita, con fecha, atribución, caché offline y posibilidad manual. No son una promesa de precio.
 
 ## Copy y crisis
 

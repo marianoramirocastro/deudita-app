@@ -17,7 +17,14 @@ No existen campos de nombre real, DNI, CUIL/CUIT, email, teléfono, domicilio o 
 
 ## Tráfico de red
 
-La aplicación no implementa llamadas de red para datos financieros, backend, analytics, cuentas, sincronización, IA ni tipografías. El navegador descarga los archivos estáticos desde el hosting. El proveedor de hosting puede conservar logs técnicos normales (por ejemplo IP, user-agent, hora y recurso solicitado) según su política.
+La aplicación consulta exclusivamente estos endpoints públicos de DolarAPI para mostrar referencias de dólar blue y dólar tarjeta:
+
+- `https://dolarapi.com/v1/dolares/blue`
+- `https://dolarapi.com/v1/dolares/tarjeta`
+
+Esas solicitudes no incluyen saldos, nombres de deudas, pagos ni otros datos financieros. Las respuestas se cachean localmente para que la referencia siga visible sin conexión y se rotulan con fecha, proveedor y fuente informada. La aplicación no implementa backend financiero, analytics, cuentas, sincronización ni IA.
+
+El navegador también descarga los archivos estáticos desde el hosting. Tanto el proveedor de hosting como el servicio de cotizaciones pueden conservar logs técnicos normales (por ejemplo IP, user-agent, hora y recurso solicitado) según sus políticas.
 
 ## Exportación e importación
 
