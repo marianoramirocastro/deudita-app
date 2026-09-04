@@ -25,14 +25,16 @@ Transformar una situación difusa en un próximo paso visible: cuánto se debe, 
 - El modo demo es una vista aislada con datos ficticios y no escribe en IndexedDB.
 - Los snapshots son explícitos (“Cerrar este mes”) para no crear históricos sin que la persona entienda el momento medido.
 - La información regulatoria vive en una estructura de contenido con fuente externa, no dentro del motor.
-- En carteras mixtas, el progreso usa la referencia ARS fijada al alta; si no existe, promedia el avance relativo de cada deuda y lo explica. La cotización diaria nunca reescribe el avance histórico.
+- El progreso de cartera se calcula por moneda. ARS y USD conservan denominadores, pagos y porcentajes independientes; ninguna cotización interviene en ese cálculo.
 - Las cotizaciones blue y tarjeta se usan como referencia explícita, con fecha, atribución, caché offline y posibilidad manual. No son una promesa de precio.
 
 ## Corrección P0 de progreso y modos
 
 Antes de esta iteración, `useFinance` llamaba a una función de progreso basada solo en saldos, mientras Dashboard, Simple y Evolución elegían ramas y formatos propios según la moneda. En ARS la suma era correcta, pero no existía un contrato único que obligara a todas las interfaces a usar la cartera completa; la presentación mixta podía parecer el avance de un subconjunto.
 
-La fuente única ahora es `calculatePortfolioProgress(debts, payments)`. Para una moneda calcula `sum(initialBalance)` contra `sum(balance)`. En una cartera ARS/USD pondera cada deuda con su conversión inicial bloqueada; si falta esa referencia, usa el promedio del avance relativo y lo identifica como aproximado. Ninguna pantalla vuelve a calcular el porcentaje.
+La fuente única ahora es `calculateCurrencyProgress(debts, currency)`, expuesta a las pantallas mediante `calculateProgressByCurrency(debts)`. Cada moneda calcula exclusivamente `sum(initialBalance)` contra `sum(balance)` de sus propias deudas. Simple, Completo, ayudas y Evolución consumen esos resultados sin crear un porcentaje combinado. Las cotizaciones y las referencias de conversión se conservan para equivalencias orientativas, pero no participan del progreso.
+
+Los cierres mensuales nuevos guardan saldos ARS y USD por separado. Los snapshots anteriores se conservan para compatibilidad con backups, pero no se grafican como si fueran una serie monetaria comparable cuando no tienen ese desglose.
 
 El conflicto de modos no provenía de bases separadas: Simple y Completo siempre compartieron IndexedDB. La interferencia estaba en la navegación Simple → Completo, que volvía a abrir el onboarding sobre una cartera existente y permitía recargar datos equivalentes. Cambiar de modo ahora modifica únicamente `experienceMode` y navega a la interfaz correspondiente; deudas, saldos, pagos e historial no se tocan.
 

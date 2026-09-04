@@ -1,6 +1,6 @@
 import type { Debt,StrategyKind } from '../types/models'
-export { calculatePortfolioProgress } from './portfolio-progress'
-export type { PortfolioProgress } from './portfolio-progress'
+export { calculateCurrencyProgress,calculateProgressByCurrency } from './currency-progress'
+export type { CurrencyProgress,ProgressByCurrency } from './currency-progress'
 export { calculateBudget,sumAmounts } from './affordability'
 export type { BudgetSummary } from './affordability'
 export { allowsExtraPayment,debtBehavior,installmentWarning,mandatoryPayment,monthlyObligation } from './installments'

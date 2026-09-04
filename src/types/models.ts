@@ -20,7 +20,11 @@ export interface Debt {
   conversionRate?: number; conversionSource?: ConversionPreference; conversionDate?: string; initialConvertedBalanceARS?: number
 }
 export interface DebtPayment { id: ID; debtId: ID; amount: number; date: string; note?: string; currency: Currency; conversionRate?: number; amountARS?: number }
-export interface MonthlySnapshot { id: ID; date: string; incomeTotal: number; essentialTotal: number; adjustableTotal: number; debtTotal: number }
+export interface MonthlySnapshot {
+  id: ID; date: string; incomeTotal: number; essentialTotal: number; adjustableTotal: number;
+  /** Campo histórico conservado para backups anteriores. Los gráficos nuevos no lo mezclan entre monedas. */
+  debtTotal: number; debtTotalARS?: number; debtTotalUSD?: number
+}
 export interface SavingsGoal { id: ID; expenseLabel: string; currentAmount: number; targetAmount: number; createdAt: string }
 export type ProgressCharacter = 'runner' | 'woman' | 'walker' | 'car' | 'bike' | 'rocket' | 'mate' | 'dot'
 export interface BubblePosition { xRatio: number; yRatio: number }
