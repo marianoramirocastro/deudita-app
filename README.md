@@ -1,4 +1,4 @@
- DeudARG
+# DeudARG
 
 Aplicación web/PWA argentina, local-first, para organizar y seguir deudas con claridad, privacidad y acompañamiento sin juicio. Su lema es: **“Organizá tus deudas. Una cosa por vez.”** No tiene backend, cuentas, conexión bancaria ni analytics.
 
