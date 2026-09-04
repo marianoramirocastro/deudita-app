@@ -1,0 +1,2 @@
+import { BarChart3,BookOpen,CircleDollarSign,Home,Menu,ReceiptText,Scale } from 'lucide-react'
+export const NAV_ITEMS=[{to:'/plan',label:'Hoy',icon:Home},{to:'/deudas',label:'Deudas',icon:CircleDollarSign},{to:'/gastos',label:'Gastos',icon:ReceiptText},{to:'/progreso',label:'Evolución',icon:BarChart3},{to:'/entender',label:'Entender',icon:BookOpen},{to:'/simular',label:'Simular',icon:Scale},{to:'/mas',label:'Más',icon:Menu}]

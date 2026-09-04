@@ -20,8 +20,11 @@ class SalidaDB extends Dexie {
       await tx.table('settings').toCollection().modify(settings=>{if(settings.progressCharacter==='capybara')settings.progressCharacter='dot';const position=settings.bubblePosition;if(position&&'x' in position&&'y' in position){delete settings.bubblePosition}})
       await tx.table('meta').toCollection().modify(meta=>{meta.schemaVersion=3;meta.updatedAt=new Date().toISOString()})
     })
+    this.version(4).stores({ incomes:'id,kind', expenses:'id,kind', debts:'id,type,dueDate,dueWindow,manualOrder,status,currency', payments:'id,debtId,date,currency', snapshots:'id,date', savingsGoals:'id', settings:'id', meta:'id', exchangeRates:'type,updatedAt,fetchedAt' }).upgrade(async tx=>{
+      await tx.table('meta').toCollection().modify(meta=>{meta.schemaVersion=4;meta.updatedAt=new Date().toISOString()})
+    })
   }
 }
 export const db = new SalidaDB()
-export async function ensureDB() { const now = new Date().toISOString(); await db.transaction('rw', db.meta, db.settings, async () => { if (!await db.meta.get('main')) await db.meta.put({ id:'main', schemaVersion:3, createdAt:now, updatedAt:now }); if (!await db.settings.get('main')) await db.settings.put({ id:'main', ...defaultSettings }) }) }
+export async function ensureDB() { const now = new Date().toISOString(); await db.transaction('rw', db.meta, db.settings, async () => { if (!await db.meta.get('main')) await db.meta.put({ id:'main', schemaVersion:4, createdAt:now, updatedAt:now }); if (!await db.settings.get('main')) await db.settings.put({ id:'main', ...defaultSettings }) }) }
 export async function touchDB() { const meta = await db.meta.get('main'); if (meta) await db.meta.put({ ...meta, updatedAt:new Date().toISOString() }) }

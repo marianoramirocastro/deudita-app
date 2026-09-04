@@ -1,4 +1,7 @@
-import type { DebtType, ProgressCharacter, StrategyKind } from './models'
+import type { Debt, DebtType, DueWindow, ProgressCharacter, StrategyKind } from './models'
 export const debtTypeLabels: Record<DebtType, string> = { credit_card:'Tarjeta de crédito', personal_loan:'Préstamo personal', bank_loan:'Préstamo bancario', fintech_loan:'Préstamo fintech', mortgage:'Hipoteca', services:'Servicios atrasados', taxes:'Impuestos', rent:'Alquiler atrasado', family:'Deuda con familiar', friend:'Deuda con amigo', other:'Otra' }
 export const strategyLabels: Record<StrategyKind, string> = { avalanche:'Avalancha', snowball:'Bola de nieve', personal:'Prioridad personal', manual:'Manual' }
 export const characterLabels: Record<ProgressCharacter, { label:string; icon:string }> = { runner:{label:'Persona corriendo',icon:'🏃'}, woman:{label:'Mujer corriendo',icon:'🏃‍♀️'}, walker:{label:'Persona caminando',icon:'🚶‍♂️'}, car:{label:'Auto',icon:'🚗'}, bike:{label:'Bicicleta',icon:'🚲'}, rocket:{label:'Cohete',icon:'🚀'}, mate:{label:'Mate',icon:'🧉'}, dot:{label:'Punto simple',icon:'●'} }
+export const dueWindowLabels:Record<DueWindow,string>={early:'Principio de mes',mid:'Mitad de mes',late:'Fin de mes'}
+export const paymentLabel=(type:DebtType)=>type==='credit_card'?'Pago mínimo':type==='personal_loan'||type==='bank_loan'||type==='fintech_loan'||type==='mortgage'?'Cuota mensual':type==='family'||type==='friend'?'Pago mensual acordado':'Cuota pactada'
+export const debtDueLabel=(debt:Debt)=>debt.dueDate?undefined:debt.dueWindow?dueWindowLabels[debt.dueWindow]:'Sin vencimiento cargado'
